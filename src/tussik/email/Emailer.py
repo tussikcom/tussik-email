@@ -28,7 +28,7 @@ class Emailer:
                  '__subject', '__html', '__text', '__attach', '__headers', '__headers_raw',
                  '__host', '__port', '__username', '__password']
     __g_host: Optional[str] = None
-    __g_port: Optional[int] = None
+    __g_port: int = 587
     __g_username: Optional[str] = None
     __g_password: Optional[str] = None
 
@@ -54,9 +54,9 @@ class Emailer:
         self.__errormsg: Optional[str] = None
 
     @classmethod
-    def setGlobal(cls, host: str, port: int = 587,
-                  username: Optional[str] = None,
-                  password: Optional[str] = None):
+    def setDefault(cls, host: str, port: int = 587,
+                   username: Optional[str] = None,
+                   password: Optional[str] = None):
         cls.__g_host: str = host
         cls.__g_port: int = port
         cls.__g_username: Optional[str] = username
@@ -238,6 +238,8 @@ class Emailer:
             host = self.__host
         if host is None:
             host = Emailer.__g_host
+        if host is None:
+            raise Exception("host is required")
 
         # current vs instance vs global
         if port is None:
