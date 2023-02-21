@@ -1,0 +1,51 @@
+{
+  "page": {
+    "width": 800
+  },
+  "fonts": [
+    {
+      "name": "Helvetica"
+    },
+    {
+      "name": "serif"
+    },
+    {
+      "name": "Arial"
+    }
+  ],
+  "footer": {
+    "height": 200,
+    "script": "My Footer Text",
+    "halign": "right"
+  },
+  "preview": {
+    "script": "message with a value of {{value}}"
+  },
+  "subject": {
+    "script": "[TEST] Product {{productname}} is amazing"
+  },
+  "headers": {
+    "key1": "value{number}",
+    "key2": "{specialvalue}"
+  },
+  "sections": [
+    {
+      "segments": [
+        {
+          "width": "50%",
+          "renders": [
+            {
+              "type": "button",
+              "url": "https://tussik.com",
+              "text": "Tussik"
+            },
+            {
+              "type": "text",
+              "script": "Hello World"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
