@@ -1,5 +1,5 @@
 import logging
-from typing import List
+from typing import List, Optional
 
 from tussik.email.blocks.border import BuildBorder
 from tussik.email.blocks.context import BuildContext
@@ -10,7 +10,7 @@ logger = logging.getLogger("tussik.email")
 
 
 class BuildSection:
-    __slots__ = ['border', 'tag', 'ordinal', 'segments']
+    __slots__ = ['border', 'tag', 'ordinal', 'segments', 'hide']
 
     def __str__(self):
         return f"[section] ordinal:{self.ordinal} segments:{len(self.segments)}"
@@ -19,6 +19,7 @@ class BuildSection:
         self.border: BuildBorder = BuildBorder(bt)
         self.tag: str = bt.gettext("tag", "").strip().lower()
         self.ordinal: int = bt.getint('ordinal', 0)
+        self.hide: Optional[str] = bt.gettext("hide")
 
         segments = bt.getlist('segments')
         self.segments: List[BuildSegment] = []
@@ -61,6 +62,10 @@ class BuildSection:
 
     def render(self, context: BuildContext) -> str:
         if len(self.segments) == 0:
+            return ""
+
+        hide = context.evalbool(self.hide)
+        if isinstance(hide, bool) and hide:
             return ""
 
         html = ""

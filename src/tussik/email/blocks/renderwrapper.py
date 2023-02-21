@@ -14,11 +14,13 @@ class BuildRenderWrapper(object):
         payload['type'] = item.__class__.typename
         payload['tag'] = item.tag
         payload['ordinal'] = item.ordinal
+        payload['hide'] = item.hide
         if preview:
+            context = BuildContext()
             payload['preview'] = {
-                "enter": cls.render_enter(),
-                "body": item.render(),
-                "exit": cls.render_exit()
+                "enter": cls.render_enter(item, context),
+                "body": item.render(context),
+                "exit": cls.render_exit(item, context)
             }
         return payload
 
@@ -38,5 +40,9 @@ class BuildRenderWrapper(object):
 
     @classmethod
     def render(cls, item: BuildRender, context: BuildContext) -> str:
+        hide = context.evalbool(item.hide)
+        if isinstance(hide, bool) and hide:
+            return ""
+
         html = "\t\t\t\t" + item.render(context) + "\n"
         return cls.render_enter(item, context) + html + cls.render_exit(item, context)

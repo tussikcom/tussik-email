@@ -1,5 +1,6 @@
 import abc
 import logging
+from typing import Optional
 
 from tussik.email.blocks.context import BuildContext
 from tussik.email.blocks.template import BuildTemplate
@@ -16,6 +17,7 @@ class BuildRender(object):
     def __init__(self, bt: BuildTemplate):
         self.tag: str = bt.gettext("tag", "").strip().lower()
         self.ordinal: int = bt.getint("ordinal", 0)
+        self.hide: Optional[str] = bt.gettext("hide")
 
     @abc.abstractmethod
     def export(self) -> dict:

@@ -1,3 +1,4 @@
+import ast
 import logging
 from typing import Dict, Union, Optional, Any
 
@@ -36,11 +37,41 @@ class BuildContext:
     def setValue(self, key: str, value: Union[str, int, float, bool]):
         self._values[key] = value
 
-    def eval(self, template: str) -> str:
+    def eval(self, template: Optional[str] = None) -> str:
         try:
+            if not isinstance(template, str):
+                return ""
             tmp = self._env.from_string(template)
             value = str(tmp.render(**self._data)).strip()
             return value
         except Exception as e:
             logger.error(f"failed to process script")
         return ""
+
+    def evalbool(self, template: Optional[str] = None) -> Optional[bool]:
+        try:
+            if not isinstance(template, str):
+                return None
+            tmp = self._env.from_string(template)
+            value = str(tmp.render(**self._data)).strip()
+            result = ast.literal_eval(value)
+            if isinstance(result, bool):
+                return result
+            return None
+        except Exception as e:
+            logger.error(f"failed to process script")
+        return None
+
+    def evalint(self, template: Optional[str] = None) -> Optional[int]:
+        try:
+            if not isinstance(template, str):
+                return None
+            tmp = self._env.from_string(template)
+            value = str(tmp.render(**self._data)).strip()
+            result = ast.literal_eval(value)
+            if isinstance(result, int):
+                return result
+            return None
+        except Exception as e:
+            logger.error(f"failed to process script")
+        return None

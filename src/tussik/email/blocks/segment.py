@@ -1,5 +1,5 @@
 import logging
-from typing import List
+from typing import List, Optional
 
 from tussik.email.blocks.border import BuildBorder
 from tussik.email.blocks.context import BuildContext
@@ -13,6 +13,8 @@ logger = logging.getLogger("tussik.email")
 
 class BuildSegment:
 
+    __slots__ = ['border', 'tag', 'ordinal', 'hide', 'renders']
+
     def __str__(self):
         return f"[segment] ordinal:{self.ordinal} renders:{len(self.renders)}"
 
@@ -20,6 +22,7 @@ class BuildSegment:
         self.border: BuildBorder = BuildBorder(bt)
         self.tag: str = str(bt.get('tag') or "").strip().lower()
         self.ordinal: int = bt.getint('ordinal', 0)
+        self.hide: Optional[str] = bt.gettext("hide")
 
         renders = bt.getlist('renders')
         self.renders: List[BuildRender] = []
@@ -64,6 +67,11 @@ class BuildSegment:
 
     def render(self, context: BuildContext) -> str:
         html = ""
+
+        hide = context.evalbool(self.hide)
+        if isinstance(hide, bool) and hide:
+            return ""
+
         # TODO: calculate column widths and render with adjustments
         for render in self.renders:
             html += BuildRenderWrapper.render(render, context)

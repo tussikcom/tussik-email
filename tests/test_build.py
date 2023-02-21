@@ -28,6 +28,7 @@ g_template = {
     },
     "sections": [
         {
+            "hide": "{{ productname.startswith('XAcme') }}",
             "segments": [
                 {
                     "width": "50%",
