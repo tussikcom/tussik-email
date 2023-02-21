@@ -1,6 +1,7 @@
 import logging
 from typing import Optional
 
+from tussik.email.blocks.context import BuildContext
 from tussik.email.blocks.template import BuildTemplate
 
 logger = logging.getLogger("tussik.email")
@@ -18,5 +19,5 @@ class BuildHeader:
     def export(self) -> dict:
         return {'name': self.name, 'script': self.script}
 
-    def render(self) -> Optional[str]:
-        return self.script
+    def render(self, context: BuildContext) -> Optional[str]:
+        return context.eval(self.script or "")

@@ -25,4 +25,5 @@ class BuildText(BuildRender):
         return payload
 
     def render(self, context: BuildContext) -> str:
-        return f"<p>{self.script}</p>"
+        value = context.eval(self.script)
+        return f"<p>{value}</p>"

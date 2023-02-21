@@ -51,6 +51,7 @@ class EmailBuilder:
     def export(self, format: EmailTemplateFormatEnum = EmailTemplateFormatEnum.dict) -> Union[str, dict, None]:
         if self._body is None:
             return None
+
         template = self._body.export(False)
         if format == EmailTemplateFormatEnum.json:
             return json.dumps(template, indent=4)
@@ -62,25 +63,36 @@ class EmailBuilder:
     def preview(self) -> Optional[dict]:
         if self._body is None:
             return None
+
         return self._body.export(True)
 
-    def render(self, debug: bool = False) -> Optional[str]:
+    def subject(self, **kwargs) -> Optional[str]:
         if self._body is None:
             return None
-        context = BuildContext()
+
+        context = BuildContext(**kwargs)
+        value = self._body.subject.render(context)
+        return value
+
+    def render(self, debug: bool = False, **kwargs) -> Optional[str]:
+        if self._body is None:
+            return None
+
+        context = BuildContext(**kwargs)
         context.debug = debug
         return self._body.render(context)
 
-    def update(self, msg: Emailer) -> bool:
+    def update(self, msg: Emailer, **kwargs) -> bool:
         if self._body is None:
             return False
-        context = BuildContext()
+
+        context = BuildContext(**kwargs)
         msg.subject = self._body.subject.render(context)
         msg.html = self._body.render(context)
 
         for header in self._body.headers:
             name = header.name
-            value = header.render()
+            value = header.render(context)
             if isinstance(value, str) and len(value) > 0 and len(name) > 0:
                 msg.header(header.name, value)
 

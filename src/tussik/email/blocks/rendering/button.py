@@ -35,6 +35,7 @@ class BuildButton(BuildRender):
         return payload
 
     def render(self, context: BuildContext) -> str:
+        value = context.eval(self.text)
         color = self.font.color or "#fffff"
         html = f"""
         <a rel="noopener" target="_blank" href="{self.url}"
@@ -42,7 +43,7 @@ class BuildButton(BuildRender):
             <!--[if mso]>
             <i style="letter-spacing: 25px; mso-font-width: -100%; mso-text-raise: 30pt;">&nbsp;</i>
             <![endif]-->
-            <span style="mso-text-raise: 15pt;">{self.text}</span>
+            <span style="mso-text-raise: 15pt;">{value}</span>
             <!--[if mso]>
             <i style="letter-spacing: 25px; mso-font-width: -100%;">&nbsp;</i>
             <![endif]-->

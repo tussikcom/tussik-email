@@ -20,4 +20,4 @@ class BuildSubject(object):
         return {'script': self.script}
 
     def render(self, context: BuildContext) -> str:
-        return self.script or ""
+        return context.eval(self.script or "")
