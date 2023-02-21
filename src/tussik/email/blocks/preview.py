@@ -1,6 +1,7 @@
 import logging
 from typing import Optional
 
+from tussik.email.blocks.context import BuildContext
 from tussik.email.blocks.template import BuildTemplate
 
 logger = logging.getLogger("tussik.email")
@@ -18,11 +19,16 @@ class BuildPreview:
     def export(self) -> dict:
         return {'script': self.script}
 
-    def render(self) -> str:
+    def render(self, context: BuildContext) -> str:
         if self.script is None:
             return ""
+
+        value = context.eval(self.script)
+        if not isinstance(value, str):
+            return ""
+
         html = f"""
-        <div style="display:none; max-height: 0px; overflow: hidden">{self.script}</div>
+        <div style="display:none; max-height: 0px; overflow: hidden">{value}</div>
         <div style="display: none; max-height: 0px; overflow: hidden;">&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;
             &nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;
             &nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;

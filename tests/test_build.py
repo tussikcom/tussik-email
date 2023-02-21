@@ -17,7 +17,7 @@ g_template = {
         "halign": "right"
     },
     "preview": {
-        "script": "message with a value of {{value}}"
+        "script": "message with a value of {{productname}}"
     },
     "subject": {
         "script": "[TEST] Product {{productname}} is amazing"

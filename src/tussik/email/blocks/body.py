@@ -100,6 +100,7 @@ class BuildBody(object):
         for section in self.sections:
             html += section.render(context)
         footer = self.footer.render(context)
-        html_enter = self.render_enter(context) + self.page.render_enter(context)
+        preview = self.preview.render(context)
+        html_enter = self.render_enter(context) + preview + self.page.render_enter(context)
         html_exit = self.page.render_exit(context) + footer + self.render_exit(context)
         return html_enter + html + html_exit
