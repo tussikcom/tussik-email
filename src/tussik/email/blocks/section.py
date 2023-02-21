@@ -3,6 +3,7 @@ from typing import List, Optional
 
 from tussik.email.blocks.border import BuildBorder
 from tussik.email.blocks.context import BuildContext
+from tussik.email.blocks.foreach import BuildForeach
 from tussik.email.blocks.segment import BuildSegment
 from tussik.email.blocks.template import BuildTemplate
 
@@ -10,7 +11,7 @@ logger = logging.getLogger("tussik.email")
 
 
 class BuildSection:
-    __slots__ = ['border', 'tag', 'ordinal', 'segments', 'hide']
+    __slots__ = ['border', 'tag', 'ordinal', 'segments', 'hide', 'foreach']
 
     def __str__(self):
         return f"[section] ordinal:{self.ordinal} segments:{len(self.segments)}"
@@ -20,6 +21,7 @@ class BuildSection:
         self.tag: str = bt.gettext("tag", "").strip().lower()
         self.ordinal: int = bt.getint('ordinal', 0)
         self.hide: Optional[str] = bt.gettext("hide")
+        self.foreach: BuildForeach = BuildForeach(bt)
 
         segments = bt.getlist('segments')
         self.segments: List[BuildSegment] = []
@@ -38,6 +40,7 @@ class BuildSection:
             'segments': [segment.export() for segment in self.segments]
         }
         self.border.merge(payload)
+        self.foreach.merge(payload)
         if preview:
             context = BuildContext()
             payload['preview'] = {
@@ -68,8 +71,37 @@ class BuildSection:
         if isinstance(hide, bool) and hide:
             return ""
 
-        html = ""
+        if isinstance(self.foreach.iterator, str) and isinstance(self.foreach.alias, str):
+
+            html = ""
+            index: int = -1
+
+            while True:
+                index += 1
+                context.clearData(self.foreach.alias)
+                context.setData("_index", index)
+                script = f"{self.foreach.iterator}[{index}]"
+                value = context.evalany(script)
+                if value is None:
+                    context.clearData("_index")
+                    break
+                context.setData(self.foreach.alias, value)
+
+                keep = context.evalbool(self.foreach.filter)
+                if isinstance(keep, bool) and not keep:
+                    continue
+
+                for segment in self.segments:
+                    html += self.render_enter(context)
+                    html += segment.render(context)
+                    html += self.render_exit(context)
+
+            context.clearData(self.foreach.alias)
+            context.clearData("_index")
+            return html
+
         # TODO: calculate column widths and render with adjustments
+        html = ""
         for segment in self.segments:
             html += segment.render(context)
         return self.render_enter(context) + html + self.render_exit(context)

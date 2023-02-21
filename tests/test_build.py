@@ -28,7 +28,10 @@ g_template = {
     },
     "sections": [
         {
-            "hide": "{{ productname.startswith('XAcme') }}",
+            "hide": "productname.startswith('XAcme')",
+            "foreach-alias": "item",
+            "foreach-iterator": "people",
+            "foreach-filter": "item.name != 'Tom'",
             "segments": [
                 {
                     "width": "50%",
@@ -40,7 +43,7 @@ g_template = {
                         },
                         {
                             "type": "text",
-                            "script": "Hello World"
+                            "script": "Hello {{ item.name }}"
                         }
                     ]
                 }

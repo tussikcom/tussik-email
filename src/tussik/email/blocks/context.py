@@ -28,6 +28,10 @@ class BuildContext:
     def setData(self, key: str, value: Any):
         self._data[key] = value
 
+    def clearData(self, key: str):
+        if key in self._data:
+            del self._data[key]
+
     def getValue(self, key: str, defval: Union[str, int, float, bool] = None) -> Union[str, int, float, bool]:
         value = self._values.get(key)
         if value is None:
@@ -52,7 +56,7 @@ class BuildContext:
         try:
             if not isinstance(template, str):
                 return None
-            tmp = self._env.from_string(template)
+            tmp = self._env.from_string("{{ " + template + " }}")
             value = str(tmp.render(**self._data)).strip()
             result = ast.literal_eval(value)
             if isinstance(result, bool):
@@ -66,12 +70,24 @@ class BuildContext:
         try:
             if not isinstance(template, str):
                 return None
-            tmp = self._env.from_string(template)
+            tmp = self._env.from_string("{{ " + template + " }}")
             value = str(tmp.render(**self._data)).strip()
             result = ast.literal_eval(value)
             if isinstance(result, int):
                 return result
             return None
+        except Exception as e:
+            logger.error(f"failed to process script")
+        return None
+
+    def evalany(self, template: Optional[str] = None) -> Any:
+        try:
+            if not isinstance(template, str):
+                return None
+            tmp = self._env.from_string("{{ " + template + " }}")
+            value = str(tmp.render(**self._data)).strip()
+            result = ast.literal_eval(value)
+            return result
         except Exception as e:
             logger.error(f"failed to process script")
         return None
